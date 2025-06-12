@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.time.Duration;
@@ -12,7 +13,7 @@ import java.time.Duration;
 public class Main {
     public static void main(String[] args) {
 
-        WebDriver driver = new EdgeDriver();
+        WebDriver driver = new ChromeDriver();
 
         driver.navigate().to("https://www.popmart.com/us");
 
@@ -40,10 +41,23 @@ public class Main {
 
         continueButton.click();
 
-        // add password finding
+        WebElement typePassword = driver.findElement(By.xpath("//input[@id='password']"));
+
+        typePassword.sendKeys("Originals123$");
+
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+        WebElement continueToCode = driver.findElement(By.xpath("//button[text()='CONTINUE TO SEND CODE']"));
+
+        continueButton.click();
+
+
+        // add password adding
+        // add browser proxy support
         // add IMAP support
         // Pull info from file
         // Save email + password to file
+
 
 
 
