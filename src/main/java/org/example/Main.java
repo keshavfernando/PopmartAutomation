@@ -43,7 +43,7 @@ public class Main {
 
         WebElement typePassword = driver.findElement(By.xpath("//input[@id='password']"));
 
-        typePassword.sendKeys("Originals123$");
+        typePassword.sendKeys("Testpassword");
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
