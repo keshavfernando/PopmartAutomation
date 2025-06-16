@@ -15,6 +15,8 @@ public class EmailPull
 
         String expectedSender = "na.support@popmart.com";
 
+        String expectedSubject = "Your verification code:";
+
         Pattern codePattern = Pattern.compile("\\b\\d{6}\\b");
 
         try
@@ -29,25 +31,55 @@ public class EmailPull
             Store store = session.getStore("imap");
             store.connect(username, password);
 
+            System.out.println("Logged in");
+
             Folder inbox = store.getFolder("INBOX");
             inbox.open(Folder.READ_ONLY);
 
             Message[] messages = inbox.getMessages();
 
-            if (messages.length > 0)
+            for (int i = messages.length -1; i >= 0;i--)
             {
-                Message latest = messages[messages.length - 1];
+                Message message = messages[i];
+                Address[] from = message.getFrom();
 
+                if (from != null && from[0].toString().equalsIgnoreCase(expectedSender))
+                {
+                    Address[] to = message.getRecipients(Message.RecipientType.TO);
+                    if (to != null)
+                    {
+                        for (Address addr : to)
+                        {
+                            if (addr.toString().equalsIgnoreCase(recieveEmail))
+                            {
+                                String subject = message.getSubject();
+
+                                if (subject != null && subject.startsWith(expectedSubject))
+                                {
+                                    Matcher matcher = codePattern.matcher(subject);
+                                    if (matcher.find())
+                                    {
+                                        inbox.close(false);
+                                        store.close();
+                                        code = matcher.group();
+                                        System.out.println("Code is: " + code);
+                                        return code;
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
             }
+
+
+            inbox.close(false);
+            store.close();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-        //finish
-
-
 
         return code;
     }
