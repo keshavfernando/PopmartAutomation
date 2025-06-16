@@ -1,7 +1,8 @@
-Initial Commit
+6/15 Work
 
-To Do
-- Add password handling
-- Add IMAP Support
-- Pull info from files in project
-- Save email and password to files
+- Added IMAP Support
+
+To do
+- Add file reading
+- Add file writing
+- Add address adding to account on file
