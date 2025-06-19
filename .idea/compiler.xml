@@ -9,5 +9,8 @@
         <module name="Popmart" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="data" target="24" />
+    </bytecodeTargetLevel>
   </component>
 </project>

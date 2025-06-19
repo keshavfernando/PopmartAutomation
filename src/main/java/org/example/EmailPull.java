@@ -7,11 +7,53 @@ import java.util.regex.Pattern;
 
 public class EmailPull
 {
-    public static String ImapClient(String username, String password, String recieveEmail)
+
+    private Store store;
+    private Folder inbox;
+    private Session session;
+
+
+    public void initialize(String username, String password) throws MessagingException
     {
-        String code = "";
 
         String host = "imap.gmail.com";
+
+
+        Properties props = new Properties();
+        props.put("mail.store.protocol" , "imap");
+        props.put("mail.imap.host", host);
+        props.put("mail.imap.port", "993");
+        props.put("mail.imap.ssl.enable" , "true");
+
+
+        this.session = Session.getInstance(props);
+        this.store = this.session.getStore("imap");
+        this.store.connect(username,password);
+
+
+        this.inbox = this.store.getFolder("INBOX");
+        this.inbox.open(Folder.READ_ONLY);
+
+        System.out.println("IMAP Account Logged in");
+
+    }
+
+    public void closeMail()
+    {
+        try
+        {
+            inbox.close(false);
+            store.close();
+            System.out.println("IMAP Account Logged out");
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public String getCode(String receiveEmail)
+    {
+        String code = "";
 
         String expectedSender = "na.support@popmart.com";
 
@@ -21,21 +63,6 @@ public class EmailPull
 
         try
         {
-            Properties props = new Properties();
-            props.put("mail.store.protocol" , "imap");
-            props.put("mail.imap.host", host);
-            props.put("mail.imap.port", "993");
-            props.put("mail.imap.ssl.enable" , "true");
-
-            Session session = Session.getInstance(props);
-            Store store = session.getStore("imap");
-            store.connect(username, password);
-
-            System.out.println("Logged in");
-
-            Folder inbox = store.getFolder("INBOX");
-            inbox.open(Folder.READ_ONLY);
-
             Message[] messages = inbox.getMessages();
 
             for (int i = messages.length -1; i >= 0;i--)
@@ -50,7 +77,7 @@ public class EmailPull
                     {
                         for (Address addr : to)
                         {
-                            if (addr.toString().equalsIgnoreCase(recieveEmail))
+                            if (addr.toString().equalsIgnoreCase(receiveEmail))
                             {
                                 String subject = message.getSubject();
 
@@ -73,16 +100,11 @@ public class EmailPull
                 }
             }
 
-
-            inbox.close(false);
-            store.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return code;
     }
-
 
 }
