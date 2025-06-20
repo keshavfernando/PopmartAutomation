@@ -1,6 +1,8 @@
 package org.example;
 
 import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,44 +55,44 @@ public class EmailPull
 
     public String getCode(String receiveEmail)
     {
-        String code = "";
-
+        System.out.println("getCode function initializing");
         String expectedSender = "na.support@popmart.com";
-
         String expectedSubject = "Your verification code:";
-
+        String code = "";
         Pattern codePattern = Pattern.compile("\\b\\d{6}\\b");
 
         try
         {
-            Message[] messages = inbox.getMessages();
+            int totalMessages = inbox.getMessageCount();
+            System.out.println("Total message count is: " + totalMessages);
+            int start = Math.max(1, totalMessages - 9);
+            Message[] messages = inbox.getMessages(start, totalMessages);
+            FetchProfile fetchProfile = new FetchProfile();
+            fetchProfile.add(FetchProfile.Item.ENVELOPE);
 
-            for (int i = messages.length -1; i >= 0;i--)
+            for (int i = messages.length -1; i >= 0; i--)
             {
                 Message message = messages[i];
                 Address[] from = message.getFrom();
+                Address[] to = message.getRecipients(Message.RecipientType.TO);
+                String subject = message.getSubject();
+                System.out.println(subject);
 
-                if (from != null && from[0].toString().equalsIgnoreCase(expectedSender))
-                {
-                    Address[] to = message.getRecipients(Message.RecipientType.TO);
-                    if (to != null)
-                    {
-                        for (Address addr : to)
-                        {
-                            if (addr.toString().equalsIgnoreCase(receiveEmail))
-                            {
-                                String subject = message.getSubject();
+                if (from != null && from.length > 0) {
+                    InternetAddress sender = (InternetAddress) from[0];
+                    if (sender.getAddress().equalsIgnoreCase(expectedSender)) {
 
-                                if (subject != null && subject.startsWith(expectedSubject))
-                                {
-                                    Matcher matcher = codePattern.matcher(subject);
-                                    if (matcher.find())
-                                    {
-                                        inbox.close(false);
-                                        store.close();
-                                        code = matcher.group();
-                                        System.out.println("Code is: " + code);
-                                        return code;
+                        if (to != null) {
+                            for (Address addr : to) {
+                                InternetAddress recipient = (InternetAddress) addr;
+                                if (recipient.getAddress().equalsIgnoreCase(receiveEmail)) {
+                                    if (subject != null && subject.startsWith(expectedSubject)) {
+                                        Matcher matcher = codePattern.matcher(subject);
+                                        if (matcher.find()) {
+                                            code = matcher.group();
+                                            System.out.println("Code found! Code is: " + code);
+                                            return code;
+                                        }
                                     }
                                 }
                             }
@@ -98,8 +100,8 @@ public class EmailPull
 
                     }
                 }
-            }
 
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

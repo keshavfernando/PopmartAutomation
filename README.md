@@ -1,3 +1,7 @@
+6/19 Work
+- Rewrote Selenium browser to be undetected by Popmart website
+- Rewrote Imap to pull email code after it is sent
+
 6/18 Work
 - Rewrote Imap to initialize imap and close imap
 - Finished account signup flow + adjust timeouts to site
@@ -14,4 +18,4 @@ To do
 
 
 Future Work (requires rewrite)
-- Proxy support (write in playwright)
+- Rewrite proxy support with extension
