@@ -1,3 +1,14 @@
+Welcome to the Popmart Account Gen by kf.volt
+
+To use the generator, follow these steps
+- Download the files
+- Input an email list in emails.txt (data file)
+- Input proxies in the proxies.txt (data file)
+- Run the Main.Java file
+
+Work Log
+===
+
 6/29 Work
 - Rewrote Flow in Playwright
 - Added Proxy Support
