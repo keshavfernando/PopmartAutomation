@@ -63,7 +63,8 @@ public class Main {
             String userName = proxyParts[2];
             String proxyPass = proxyParts[3];
             String randomUserAgent = userAgentLines.get(random.nextInt(userAgentLines.size()));
-            AccountGenNew.flowNew(client, emailLine, host, port, userName, proxyPass, randomUserAgent, acctPassword);
+            AccountGenNew browser = new AccountGenNew();
+            browser.flowNew(client, emailLine,host,port,userName,proxyPass,randomUserAgent,acctPassword);
             writer.write(emailLine + ":" + acctPassword);
             writer.newLine();
             System.out.println("Account written to file: " + emailLine);

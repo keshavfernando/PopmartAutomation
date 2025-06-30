@@ -11,6 +11,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class AccountGenNew {
 
 
+    public Playwright playwright;
+    public Browser browser;
+    public Page page;
+
     public static void sleepRandom(int minMillis, int maxMillis)
     {
         int sleepTime = ThreadLocalRandom.current().nextInt(minMillis, maxMillis);
@@ -25,32 +29,34 @@ public class AccountGenNew {
     }
 
 
-    public static void flowNew(EmailPull client, String email, String host, String port, String username, String password, String userAgent, String acctPass)
+    public void flowNew(EmailPull client, String email, String host, String port, String username, String password, String userAgent, String acctPass)
     {
 
-
-        try (Playwright playwright = Playwright.create())
+        try
         {
-            BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions()
+            playwright = Playwright.create();
+            browser = playwright.chromium().launch(new BrowserType.LaunchOptions()
                     .setHeadless(false)
-                    .setChannel("chromium")
-                    .setProxy(new Proxy("http://" + host + ":" + port)
-                    .setUsername(username)
-                    .setPassword(password))
                     .setArgs(List.of(
                             "--disable-blink-features=AutomationControlled",
-                            "--start-maximized",
-                            "--no-sandbox"));
-
-            Browser browser = playwright.chromium().launch(launchOptions);
-            Browser.NewContextOptions contextOptions = new Browser.NewContextOptions()
+                            "--no-sandbox",
+                            "--start-maximized"
+                    ))
+                    .setProxy(new Proxy("http://" + host + ":" + port)
+                    .setUsername(username)
+                    .setPassword(password)));
+            BrowserContext context = browser.newContext(new Browser.NewContextOptions()
                     .setUserAgent(userAgent)
-                    .setViewportSize(null);
+                    .setViewportSize(1920,1080)
+                    .setLocale("en-US")
+                    .setTimezoneId("America/New_York"));
 
-            BrowserContext content = browser.newContext(contextOptions);
-            content.addInitScript("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})");
+            page = context.newPage();
+            page.addInitScript("Object.defineProperty(navigator, 'webdriver', { get: () => undefined });");
+            page.addInitScript("window.chrome = { runtime: {} };");
+            page.addInitScript("Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });");
+            page.addInitScript("Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });");
 
-            Page page = content.newPage();
             page.navigate("https://popmart.com/us");
             sleepRandom(25000,40000);
 
